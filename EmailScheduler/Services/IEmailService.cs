@@ -10,7 +10,7 @@ namespace EmailScheduler.Services
         /// </summary>
         /// <returns>Task representing the asynchronous operation</returns>
         Task SendAccountActivationEmailsAsync();
-        
+
         /// <summary>
         /// Checks if it's time to send emails based on the configured schedule
         /// </summary>

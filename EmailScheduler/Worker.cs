@@ -1,8 +1,7 @@
-using NLog;
+using EmailScheduler.Models;
 using EmailScheduler.Services;
 using Microsoft.Extensions.Options;
-using EmailScheduler.Models;
-using System.Collections.Generic;
+using NLog;
 
 namespace EmailScheduler;
 
@@ -26,9 +25,12 @@ public class Worker : BackgroundService
         _logger = LogManager.GetCurrentClassLogger();
         _emailService = emailService;
         _emailSettings = emailSettings.Value;
-        
+
         // Debug logging for configuration
-        _logger.Info("🔧 Configuration loaded - UseTestSchedule value: {useTestSchedule}", _emailSettings.UseTestSchedule);
+        _logger.Info(
+            "🔧 Configuration loaded - UseTestSchedule value: {useTestSchedule}",
+            _emailSettings.UseTestSchedule
+        );
     }
 
     /// <summary>
@@ -38,42 +40,60 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.Info("📧 Email Scheduler service started at: {time}", DateTimeOffset.Now);
-        _logger.Info("📋 Configured recipients: {recipients}", string.Join(", ", _emailSettings.Recipients ?? new List<string>()));
-        
+        _logger.Info(
+            "📋 Configured recipients: {recipients}",
+            string.Join(", ", _emailSettings.Recipients ?? new List<string>())
+        );
+
         if (_emailSettings.UseTestSchedule)
         {
-            _logger.Info("⏱️ Running in TEST mode - emails will be sent every {minutes} minute(s)", _emailSettings.TestIntervalMinutes);
+            _logger.Info(
+                "⏱️ Running in TEST mode - emails will be sent every {minutes} minute(s)",
+                _emailSettings.TestIntervalMinutes
+            );
         }
         else
         {
-            _logger.Info("📅 Running in PRODUCTION mode - emails will be sent weekly on {day} at {hour}:00", 
-                (DayOfWeek)_emailSettings.WeeklyScheduleDay, _emailSettings.WeeklyScheduleHour);
+            _logger.Info(
+                "📅 Running in PRODUCTION mode - emails will be sent weekly on {day} at {hour}:00",
+                (DayOfWeek)_emailSettings.WeeklyScheduleDay,
+                _emailSettings.WeeklyScheduleHour
+            );
         }
-        
+
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 _checkCount++;
-                _logger.Info("🔍 Schedule check #{count} at: {time}", _checkCount, DateTimeOffset.Now);
-                
+                _logger.Info(
+                    "🔍 Schedule check #{count} at: {time}",
+                    _checkCount,
+                    DateTimeOffset.Now
+                );
+
                 // Check if it's time to send emails
                 if (_emailService.ShouldSendEmails())
                 {
-                    _logger.Info("📤 Sending account activation emails to {count} recipients", 
-                        _emailSettings.Recipients?.Count ?? 0);
-                    
+                    _logger.Info(
+                        "📤 Sending account activation emails to {count} recipients",
+                        _emailSettings.Recipients?.Count ?? 0
+                    );
+
                     var startTime = DateTime.Now;
                     await _emailService.SendAccountActivationEmailsAsync();
                     var duration = (DateTime.Now - startTime).TotalSeconds;
-                    
-                    _logger.Info("✅ Email sending process completed in {seconds} seconds", Math.Round(duration, 2));
+
+                    _logger.Info(
+                        "✅ Email sending process completed in {seconds} seconds",
+                        Math.Round(duration, 2)
+                    );
                 }
                 else
                 {
                     _logger.Info("⏳ Not time to send emails yet - waiting for next check");
                 }
-                
+
                 // Wait one minute before checking again
                 _logger.Info("💤 Sleeping for 1 minute before next schedule check");
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
@@ -88,7 +108,7 @@ public class Worker : BackgroundService
         {
             _logger.Error(ex, "❌ Exception in Email Scheduler service: {message}", ex.Message);
         }
-        
+
         _logger.Info("👋 Email Scheduler service stopping at: {time}", DateTimeOffset.Now);
     }
 }

@@ -4,7 +4,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-EmailScheduler-d3d9ac0b-2717-451b-9b0e-c0ea5b4c8320</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,18 +1,16 @@
 using EmailScheduler;
+using EmailScheduler.Models;
+using EmailScheduler.Services;
 using NLog;
 using NLog.Extensions.Logging;
-using Microsoft.Extensions.Logging;
-using EmailScheduler.Services;
-using EmailScheduler.Models;
 
 try
 {
     var builder = Host.CreateApplicationBuilder(args);
-    
+
     // Configure email settings
-    builder.Services.Configure<EmailSettings>(
-        builder.Configuration.GetSection("EmailSettings"));
-    
+    builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
     // Register services
     builder.Services.AddSingleton<IEmailService, EmailService>();
     builder.Services.AddHostedService<Worker>();
