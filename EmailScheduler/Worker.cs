@@ -26,6 +26,9 @@ public class Worker : BackgroundService
         _logger = LogManager.GetCurrentClassLogger();
         _emailService = emailService;
         _emailSettings = emailSettings.Value;
+        
+        // Debug logging for configuration
+        _logger.Info("🔧 Configuration loaded - UseTestSchedule value: {useTestSchedule}", _emailSettings.UseTestSchedule);
     }
 
     /// <summary>
@@ -72,7 +75,7 @@ public class Worker : BackgroundService
                 }
                 
                 // Wait one minute before checking again
-                _logger.Debug("💤 Sleeping for 1 minute before next schedule check");
+                _logger.Info("💤 Sleeping for 1 minute before next schedule check");
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }

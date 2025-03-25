@@ -63,6 +63,6 @@ namespace EmailScheduler.Models
         /// <summary>
         /// Whether to use test schedule (every X minutes) or production schedule (weekly)
         /// </summary>
-        public bool UseTestSchedule { get; set; } = true;
+        public bool UseTestSchedule { get; set; }
     }
 }
